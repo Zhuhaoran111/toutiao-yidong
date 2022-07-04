@@ -1,7 +1,10 @@
 <template>
   <div class="login-container">
     <!-- 导航栏 -->
-    <van-nav-bar class="page-nav-bar" title="登录" />
+    <van-nav-bar class="page-nav-bar" title="登录">
+      <!-- 利用插槽加个叉号的按钮 -->
+      <van-icon slot="left" name="cross" @click="$router.back()"></van-icon>
+    </van-nav-bar>
 
     <!-- 登录表单 -->
     <van-form ref="loginForm" @submit="onSubmit">
@@ -113,6 +116,9 @@ export default {
         this.$store.commit("setUser", res.data.data);
 
         this.$toast.success("登录成功"); // 新的toast会覆盖之前的toast
+        //登录成功跳转回原来的页面
+        //back方式不严谨
+        this.$router.back();
         console.log(res);
       } catch (err) {
         if (err.response.status === 400) {
