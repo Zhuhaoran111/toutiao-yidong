@@ -134,8 +134,8 @@ export default {
 .home-container {
   padding-top: 174px;
   padding-bottom: 100px;
-  .van-nav-bar__title {
-    max-width: unset;
+  /deep/ .van-nav-bar__title {
+    max-width: unset; //去除父元素的max-width
   }
   .search-btn {
     width: 555px;

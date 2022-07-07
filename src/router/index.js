@@ -34,7 +34,12 @@ const routes = [
         component:()=>import('@/views/my') // 自动加载index.vue
       }
     ]
-  }
+  },
+    {
+        path:'/search',
+        name:'search',
+        component:()=>import('@/views/search') // 自动加载index.vue
+    }
 ]
 
 const router = new VueRouter({
