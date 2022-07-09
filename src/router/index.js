@@ -39,7 +39,14 @@ const routes = [
         path:'/search',
         name:'search',
         component:()=>import('@/views/search') // 自动加载index.vue
-    }
+    },
+    {
+      path:'/article/:articleId',
+      name:'article',
+      component:()=>import('@/views/article'), // 自动加载index.vue
+      props:true   //开启props传参,说白了就是把路由参数映射到组件的props中
+        //利用props解耦路由参数
+  }
 ]
 
 const router = new VueRouter({

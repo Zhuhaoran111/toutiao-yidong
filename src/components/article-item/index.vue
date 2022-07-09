@@ -1,6 +1,15 @@
 <!-- 根据文章列表接收参数 -->
 <template>
-  <van-cell class="article-item">
+  <!-- 第一种方式通过es6进行传参 :to="`/article/${article.art_id}`" 路由并携带动态参数
+       第二种方式通过路由传参的形式 params(动态路由参数)
+       :to{
+        name:'srticle'
+        params:{
+          articleId:article.art_id
+        }
+       } 
+  -->
+  <van-cell class="article-item" :to="`/article/${article.art_id}`">
     <div slot="title" class="title van-multi-ellipsis--l2">
       {{ article.title }}
     </div>
