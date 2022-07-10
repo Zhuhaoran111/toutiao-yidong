@@ -34,12 +34,31 @@
           <div slot="label" class="publish-date">
             {{ article.pubdate | relativeTime }}
           </div>
+          <!-- 这里是给子组件绑定样式和传值 -->
+          <!--模板中$event就是事件参数，$event就是事件参数，就是传过来的参数 -->
+          <!-- 当我们传递给子组件的数据既要使用还要修改
+             传递：props
+             修改：自定义事件
+             简写形式在组件上使用v-model
+             v-model="article.is_followed"
+             value="article.is_followed"
+             @input="article.is_followed = $event"
+             如果需要修改v-model的规则名称，可以通过子组件的model属性来配置修改
+          -->
+          <FollowUser
+            class="follow-btn"
+            :is-followed="article.is_followed"
+            :user-id="article.aut_id"
+            @update-is_followed="article.is_followed = $event"
+          />
           <!-- .is_followed 为true就是关注，为false就是不关注-->
-          <van-button
+          <!-- <van-button
             v-if="article.is_followed"
             class="follow-btn"
             round
             size="small"
+            :loading="followLoading"
+            @click="onFollow"
             >已关注</van-button
           >
           <van-button
@@ -50,8 +69,10 @@
             round
             size="small"
             icon="plus"
+            :loading="followLoading"
+            @click="onFollow"
             >关注</van-button
-          >
+          > -->
         </van-cell>
         <!-- /用户信息 -->
 
@@ -62,6 +83,30 @@
           ref="article-content"
         ></div>
         <van-divider>正文结束</van-divider>
+
+        <!-- 底部区域 ,前面文章渲染完毕，在执行这个评论区-->
+        <div class="article-bottom">
+          <van-button class="comment-btn" type="default" round size="small"
+            >写评论</van-button
+          >
+          <van-icon class="comment-icon" name="comment-o" info="123"></van-icon>
+          <!-- 下面是引用评论组件 -->
+          <CollectArticle
+            :article-id="article.art_id"
+            class="btn-item"
+            v-model="article.is_collected"
+          />
+
+          <!-- 下面是引用点赞组件 -->
+          <LikeArticle
+            class="btn-item"
+            v-model="article.attitude"
+            :article-id="article.art_id"
+          />
+
+          <van-icon name="share" color="#777777"></van-icon>
+        </div>
+        <!-- /底部区域 -->
       </div>
 
       <!-- 3.加载失败：404 -->
@@ -77,28 +122,23 @@
         <van-button @click="loadArticle" class="retry-btn">点击重试</van-button>
       </div>
     </div>
-
-    <!-- 底部区域 -->
-    <div class="article-bottom">
-      <van-button class="comment-btn" type="default" round size="small"
-        >写评论</van-button
-      >
-      <van-icon name="comment-o" info="123" color="#777" />
-      <van-icon color="#777" name="star-o" />
-      <van-icon color="#777" name="good-job-o" />
-      <van-icon name="share" color="#777777"></van-icon>
-    </div>
-    <!-- /底部区域 -->
   </div>
 </template>
 
 <script>
 import { getArticleById } from "@/api/article";
 import { ImagePreview } from "vant";
-
+import { addFollow, deleteFollow } from "@/api/user";
+import FollowUser from "@/components/follow-user";
+import CollectArticle from "@/components/collect-article";
+import LikeArticle from "@/components/like-article";
 export default {
   name: "ArticleIndex",
-  components: {},
+  components: {
+    FollowUser,
+    CollectArticle,
+    LikeArticle,
+  },
   props: {
     articleId: {
       type: [Number, String],
@@ -110,6 +150,7 @@ export default {
       article: {}, //文章详情
       loading: true, //加载中的文章状态
       errStatus: 0, //失败的状态码
+      followLoading: false,
     };
   },
   computed: {},
@@ -159,6 +200,30 @@ export default {
           });
         };
       });
+    },
+
+    async onFollow() {
+      this.followLoading = true; //展示关注按钮的loading状态
+      try {
+        if (this.article.is_followed) {
+          //已关注，这里取消关注
+          const { data } = await deleteFollow(this.article.aut_id);
+          // this.article.is_followed = false;
+        } else {
+          //未关注，这里点击关注
+          const { data } = await addFollow(this.article.aut_id);
+          // this.article.is_followed = true;
+        }
+        //下面简写
+        this.article.is_followed = !this.article.is_followed;
+      } catch (err) {
+        let message = "操作失败，请重试";
+        if (err.response && err.response.status === 400) {
+          message = "你不能关注你自己";
+        }
+        this.$toast = message;
+      }
+      this.followLoading = false; //无论成功还是失败都会关闭loading
     },
   },
 };
@@ -231,7 +296,7 @@ export default {
     align-items: center;
     justify-content: center;
     background-color: #fff;
-    .van-icon {
+    /deep/ .van-icon {
       font-size: 122px;
       color: #b4b4b4;
     }
