@@ -7,7 +7,6 @@
       title="黑马头条"
       @click-left="$router.back()"
     ></van-nav-bar>
-    <!-- /导航栏 -->
 
     <div class="main-wrap">
       <!-- 1.加载中 -->
@@ -19,7 +18,6 @@
       <div v-else-if="article.title" class="article-detail">
         <!-- 3文章标题 -->
         <h1 class="article-title">{{ article.title }}</h1>
-        <!-- /文章标题 -->
 
         <!-- 用户信息 -->
         <van-cell class="user-info" center :border="false">
@@ -51,28 +49,6 @@
             :user-id="article.aut_id"
             @update-is_followed="article.is_followed = $event"
           />
-          <!-- .is_followed 为true就是关注，为false就是不关注-->
-          <!-- <van-button
-            v-if="article.is_followed"
-            class="follow-btn"
-            round
-            size="small"
-            :loading="followLoading"
-            @click="onFollow"
-            >已关注</van-button
-          >
-          <van-button
-            v-else
-            class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-            :loading="followLoading"
-            @click="onFollow"
-            >关注</van-button
-          > -->
         </van-cell>
         <!-- /用户信息 -->
 
@@ -84,12 +60,29 @@
         ></div>
         <van-divider>正文结束</van-divider>
 
+        <!-- 这是应用文章评论列表组件 给子组件传一个文章id-->
+        <!-- $event是参数参数对象 -->
+        <CommentList
+          @onload-success="totalCommentCount = $event.total_count"
+          :source="article.aut_id"
+        />
+
         <!-- 底部区域 ,前面文章渲染完毕，在执行这个评论区-->
         <div class="article-bottom">
-          <van-button class="comment-btn" type="default" round size="small"
+          <van-button
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
+            @click="isPostShow = true"
             >写评论</van-button
           >
-          <van-icon class="comment-icon" name="comment-o" info="123"></van-icon>
+          <!--  :info="totalCommentCount"这是评论的数量 -->
+          <van-icon
+            class="comment-icon"
+            name="comment-o"
+            :info="totalCommentCount"
+          ></van-icon>
           <!-- 下面是引用评论组件 -->
           <CollectArticle
             :article-id="article.art_id"
@@ -106,7 +99,12 @@
 
           <van-icon name="share" color="#777777"></van-icon>
         </div>
-        <!-- /底部区域 -->
+
+        <!--发布评论的弹出层 -->
+        <van-popup v-model="isPostShow" position="bottom">
+          <!-- 这里展示评论弹出层组件 -->
+          <CommentPost :target="article.art_id" />
+        </van-popup>
       </div>
 
       <!-- 3.加载失败：404 -->
@@ -132,12 +130,16 @@ import { addFollow, deleteFollow } from "@/api/user";
 import FollowUser from "@/components/follow-user";
 import CollectArticle from "@/components/collect-article";
 import LikeArticle from "@/components/like-article";
+import CommentList from "./components/comment-list";
+import CommentPost from "./components/comment-post.vue";
 export default {
   name: "ArticleIndex",
   components: {
     FollowUser,
     CollectArticle,
     LikeArticle,
+    CommentList,
+    CommentPost,
   },
   props: {
     articleId: {
@@ -151,6 +153,8 @@ export default {
       loading: true, //加载中的文章状态
       errStatus: 0, //失败的状态码
       followLoading: false,
+      totalCommentCount: 0,
+      isPostShow: false, //控制发布评论的显示状态
     };
   },
   computed: {},
