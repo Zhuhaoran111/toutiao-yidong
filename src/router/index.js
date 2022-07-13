@@ -14,14 +14,14 @@ const routes = [
     component:()=>import('@/views/layout'),// 自动加载index.vue
     children:[
       {
-        path:'',  // 这里是空，就是默认是子路由只能有一个
+        path:'/home',  // 这里是空，就是默认是子路由只能有一个
         name:'home',
-        component:()=>import('@/views/home') 
+        component:()=>import('@/views/home'),
       },
       {
         path:'/qa',
         name:'qa',
-        component:()=>import('@/views/qa') // 自动加载index.vue
+        component:()=>import('@/views/qa'), // 自动加载index.vue
       },
       {
         path:'/video',
