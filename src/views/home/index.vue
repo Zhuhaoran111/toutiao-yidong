@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <!-- 导航栏 -->
+    <!-- 导航栏1 -->
     <van-nav-bar class="page-nav-bar" fixed>
       <van-button
         class="search-btn"
@@ -62,7 +62,7 @@
 
 <script>
 import { getUserChannels } from "@/api/user";
-import ArticleList from "./components/article-list";
+import ArticleList from "./components/Article-list";
 import ChannelEdit from "./components/channel-edit";
 import { mapState } from "vuex";
 import { getItem } from "@/utils/storage";
